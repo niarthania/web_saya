@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad-ekonomi" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F2027" />
+      <stop offset="50%" stop-color="#203A43" />
+      <stop offset="100%" stop-color="#2C5364" />
+    </linearGradient>
+    <linearGradient id="gold-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F9D423" />
+      <stop offset="100%" stop-color="#FF4E50" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="560" fill="url(#grad-ekonomi)"/>
+  <rect x="0" y="0" width="18" height="560" fill="#000" opacity="0.4"/>
+  <line x1="18" y1="0" x2="18" y2="560" stroke="#FFF" stroke-opacity="0.15" stroke-width="1.5"/>
+
+  <!-- Geometric Grid & Chart Graphic -->
+  <g opacity="0.25" stroke="#48CAE4" stroke-width="0.8">
+    <line x1="50" y1="220" x2="350" y2="220"/>
+    <line x1="50" y1="260" x2="350" y2="260"/>
+    <line x1="50" y1="300" x2="350" y2="300"/>
+    <line x1="50" y1="340" x2="350" y2="340"/>
+    <line x1="100" y1="200" x2="100" y2="360"/>
+    <line x1="160" y1="200" x2="160" y2="360"/>
+    <line x1="220" y1="200" x2="220" y2="360"/>
+    <line x1="280" y1="200" x2="280" y2="360"/>
+    <line x1="340" y1="200" x2="340" y2="360"/>
+  </g>
+  <path d="M 60 330 L 120 310 L 180 270 L 240 290 L 300 230 L 350 200" fill="none" stroke="url(#gold-grad)" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="350" cy="200" r="6" fill="#F9D423"/>
+
+  <!-- Badge -->
+  <rect x="125" y="44" width="150" height="24" rx="6" fill="#00B4D8" fill-opacity="0.2" stroke="#00B4D8" stroke-width="1"/>
+  <text x="200" y="60" fill="#90E0EF" font-family="'Inter', sans-serif" font-size="10" font-weight="700" text-anchor="middle" letter-spacing="1.5">EKONOMI &amp; BISNIS</text>
+
+  <!-- Title -->
+  <text x="200" y="115" fill="#FFFFFF" font-family="'Inter', sans-serif" font-size="25" font-weight="800" text-anchor="middle" letter-spacing="-0.5">MANAJEMEN BISNIS</text>
+  <text x="200" y="145" fill="#F9D423" font-family="'Inter', sans-serif" font-size="23" font-weight="800" text-anchor="middle" letter-spacing="-0.5">&amp; STRATEGI DIGITAL</text>
+  <text x="200" y="175" fill="#94A3B8" font-family="'Inter', sans-serif" font-size="12" text-anchor="middle">Transformasi Korporasi di Era Kecerdasan Buatan</text>
+
+  <!-- Author & University -->
+  <line x1="80" y1="470" x2="320" y2="470" stroke="#64748B" stroke-opacity="0.4" stroke-width="1"/>
+  <text x="200" y="498" fill="#F8FAFC" font-family="'Inter', sans-serif" font-size="15" font-weight="600" text-anchor="middle">Prof. Dr. Hendra Wijaya, S.E., M.M.</text>
+  <text x="200" y="522" fill="#94A3B8" font-family="'Inter', sans-serif" font-size="11" text-anchor="middle" letter-spacing="1">INSTITUT BISNIS &amp; KEUANGAN INDONESIA</text>
+</svg>

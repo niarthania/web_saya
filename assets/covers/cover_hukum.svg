@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad-hukum" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#18181B" />
+      <stop offset="50%" stop-color="#27272A" />
+      <stop offset="100%" stop-color="#3F3F46" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="560" fill="url(#grad-hukum)"/>
+  <rect x="0" y="0" width="18" height="560" fill="#000" opacity="0.45"/>
+  <line x1="18" y1="0" x2="18" y2="560" stroke="#E4E4E7" stroke-opacity="0.2" stroke-width="1.5"/>
+
+  <!-- Scales of Justice illustration -->
+  <g transform="translate(140, 200)">
+    <line x1="60" y1="20" x2="60" y2="140" stroke="#FBBF24" stroke-width="4"/>
+    <line x1="10" y1="40" x2="110" y2="40" stroke="#FBBF24" stroke-width="4" stroke-linecap="round"/>
+    <line x1="20" y1="40" x2="10" y2="80" stroke="#D4D4D8" stroke-width="1.5"/>
+    <line x1="20" y1="40" x2="30" y2="80" stroke="#D4D4D8" stroke-width="1.5"/>
+    <path d="M 0 80 Q 20 95 40 80 Z" fill="#FBBF24" opacity="0.85"/>
+    <line x1="100" y1="40" x2="90" y2="80" stroke="#D4D4D8" stroke-width="1.5"/>
+    <line x1="100" y1="40" x2="110" y2="80" stroke="#D4D4D8" stroke-width="1.5"/>
+    <path d="M 80 80 Q 100 95 120 80 Z" fill="#FBBF24" opacity="0.85"/>
+    <rect x="40" y="135" width="40" height="8" rx="2" fill="#FBBF24"/>
+  </g>
+
+  <!-- Badge -->
+  <rect x="130" y="44" width="140" height="24" rx="4" fill="#27272A" stroke="#A1A1AA" stroke-width="1"/>
+  <text x="200" y="60" fill="#F4F4F5" font-family="'Inter', serif" font-size="11" font-weight="700" text-anchor="middle" letter-spacing="2">HUKUM &amp; KEBIJAKAN</text>
+
+  <!-- Title -->
+  <text x="200" y="115" fill="#FFFFFF" font-family="'Inter', serif" font-size="24" font-weight="800" text-anchor="middle">HUKUM TATA NEGARA</text>
+  <text x="200" y="145" fill="#FBBF24" font-family="'Inter', serif" font-size="20" font-weight="700" text-anchor="middle">&amp; REFORMASI PUBLIK</text>
+  <text x="200" y="172" fill="#D4D4D8" font-family="'Inter', sans-serif" font-size="12" text-anchor="middle">Kajian Yuridis Normatif dan Konstitusi Modern</text>
+
+  <!-- Author -->
+  <line x1="80" y1="470" x2="320" y2="470" stroke="#3F3F46" stroke-width="1"/>
+  <text x="200" y="498" fill="#FAFAFA" font-family="'Inter', sans-serif" font-size="15" font-weight="600" text-anchor="middle">Prof. Bagus Santoso, S.H., M.H.</text>
+  <text x="200" y="522" fill="#A1A1AA" font-family="'Inter', sans-serif" font-size="11" text-anchor="middle" letter-spacing="1">PERS HUKUM DAN KONSTITUSI</text>
+</svg>

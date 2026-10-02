@@ -1,0 +1,22 @@
+kamu adalah senior project manager. saya butuh PRD lengkap untuk produk di Bawah ini
+
+ide produk : saya ingin buat system manajemen buku perpustakaan 
+
+
+sebelum menulis apapun , tnyakan maximal 5 pertanyaan
+klarifikasi soal target user, scope must-have vs nice to have,
+batasan teknis, dan seperti apa "selesai" itu. tunggu jawaban saya
+
+lalu buat PRDD dengan bagian berikut :
+1. problame statement - siapa yg dirugikan dan kenapa
+2. target user + 2 persona
+3. goals dan non-goals
+4. user stories format "sebagai... saya ingin.... supaya.... "
+5. daftar fitur dibagi MVP / v2 /nanti
+6. functional requirement detail per fitur MVP
+7. sketsa model ( entitas + field kunci )
+8. edge case dan failure state
+9. success metrics
+10. opesn questions
+
+spesifik dan tegas. tanpa basa-basi. kalau ada requirement ambigu, tandai sebagai pertanyaan terbuka, jangan mengaranag sendiri

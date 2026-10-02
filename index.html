@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Manajemen Perpustakaan Berbasis Web</title>
+  <meta name="description" content="Sistem Informasi dan Manajemen Perpustakaan Terintegrasi untuk Mahasiswa, Siswa, Guru, Dosen, dan Admin Petugas.">
+  <link rel="stylesheet" href="css/style.css">
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- =========================================================================
+       VIEW 1: AUTHENTICATION / LOGIN (Section 14)
+       ========================================================================= -->
+  <div id="auth-view" class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">
+          <i data-lucide="book-open" style="width:28px;height:28px;"></i>
+        </div>
+        <h1>Sistem Manajemen Perpustakaan</h1>
+        <p>Silakan masuk menggunakan akun perpustakaan Anda</p>
+      </div>
+
+      <form id="form-login" onsubmit="event.preventDefault(); window.PustakaApp.handleLogin();">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email / Akun <span class="required">*</span></label>
+          <input type="email" id="login-email" class="form-control" placeholder="contoh: admin@pustaka.id" required autofocus>
+          <div id="login-error-email" class="form-error-msg">Email tidak boleh kosong.</div>
+        </div>
+
+        <div class="form-group">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <label class="form-label" for="login-password" style="margin-bottom:0;">Password <span class="required">*</span></label>
+          </div>
+          <input type="password" id="login-password" class="form-control" placeholder="Masukkan kata sandi" required>
+          <div id="login-error-password" class="form-error-msg">Kata sandi salah.</div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-xl);">
+          <label style="display:flex;align-items:center;gap:8px;font-size:0.84375rem;cursor:pointer;">
+            <input type="checkbox" id="login-remember" checked style="accent-color:var(--color-primary);"> Ingat saya
+          </label>
+          <span class="small-text" style="color:var(--color-text-muted);">Sistem Online Aktif</span>
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="btn btn-primary" style="width:100%;padding:11px;">
+          <i data-lucide="log-in"></i> Masuk ke Sistem
+        </button>
+      </form>
+
+      <!-- Demo One-Click Login Pills for Evaluator -->
+      <div class="demo-accounts-box">
+        <div class="demo-title">Login Cepat Akun Demo (Klik untuk Masuk):</div>
+        <div class="demo-pills-grid">
+          <button type="button" class="btn-demo-pill" onclick="window.PustakaApp.quickLogin('admin@pustaka.id', 'admin')">
+            <i data-lucide="shield-check" style="width:14px;height:14px;color:var(--color-primary);"></i>
+            <div><strong>Admin (Rina)</strong><br><span style="font-size:0.68rem;color:var(--color-text-muted)">Akses Penuh</span></div>
+          </button>
+          <button type="button" class="btn-demo-pill" onclick="window.PustakaApp.quickLogin('andi@siswa.pustaka.id', 'user')">
+            <i data-lucide="graduation-cap" style="width:14px;height:14px;color:var(--color-info);"></i>
+            <div><strong>Siswa (Andi)</strong><br><span style="font-size:0.68rem;color:var(--color-text-muted)">Maks 5 Buku</span></div>
+          </button>
+          <button type="button" class="btn-demo-pill" onclick="window.PustakaApp.quickLogin('dewi@kampus.pustaka.id', 'user')">
+            <i data-lucide="alert-circle" style="width:14px;height:14px;color:var(--color-error);"></i>
+            <div><strong>Mhs (Dewi)</strong><br><span style="font-size:0.68rem;color:var(--color-error)">Ada Denda $28</span></div>
+          </button>
+          <button type="button" class="btn-demo-pill" onclick="window.PustakaApp.quickLogin('budi@guru.pustaka.id', 'user')">
+            <i data-lucide="user-check" style="width:14px;height:14px;color:var(--color-success);"></i>
+            <div><strong>Guru (Pak Budi)</strong><br><span style="font-size:0.68rem;color:var(--color-text-muted)">Maks 10 Buku</span></div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       VIEW 2: MAIN APP WORKSPACE (Logged In)
+       ========================================================================= -->
+  <div id="app-view" style="display:none;" class="app-workspace">
+    <div id="app-container">
+
+      <!-- SIDEBAR NAVIGATION (Section 13.1) -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="brand-icon">
+            <i data-lucide="book-open"></i>
+          </div>
+          <div class="brand-text">
+            <h2>PustakaHub</h2>
+            <span>Sistem Akademik</span>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section-title">Menu Utama</div>
+          <div class="nav-item active" data-nav="dashboard" onclick="window.PustakaApp.navigate('dashboard')">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+          </div>
+
+          <div class="nav-item" data-nav="catalog" onclick="window.PustakaApp.navigate('catalog')">
+            <i data-lucide="library"></i>
+            <span>Katalog Buku</span>
+          </div>
+
+          <!-- ADMIN MANAGEMENT SECTION (PRD Section 40) -->
+          <div class="admin-only-nav">
+            <div class="nav-section-title">Manajemen Data</div>
+            <div class="nav-item" data-nav="books" onclick="window.PustakaApp.navigate('books')">
+              <i data-lucide="book"></i>
+              <span>Data Buku</span>
+            </div>
+            <div class="nav-item" data-nav="categories" onclick="window.PustakaApp.navigate('categories')">
+              <i data-lucide="tags"></i>
+              <span>Kategori</span>
+            </div>
+            <div class="nav-item" data-nav="members" onclick="window.PustakaApp.navigate('members')">
+              <i data-lucide="users"></i>
+              <span>Anggota</span>
+            </div>
+
+            <div class="nav-section-title">Transaksi</div>
+            <div class="nav-item" data-nav="loans" onclick="window.PustakaApp.navigate('loans')">
+              <i data-lucide="book-up-2"></i>
+              <span>Peminjaman</span>
+            </div>
+            <div class="nav-item" data-nav="returns" onclick="window.PustakaApp.navigate('returns')">
+              <i data-lucide="rotate-ccw"></i>
+              <span>Pengembalian</span>
+            </div>
+            <div class="nav-item" data-nav="fines" onclick="window.PustakaApp.navigate('fines')">
+              <i data-lucide="alert-circle"></i>
+              <span>Denda &amp; Sanksi</span>
+              <span id="sidebar-fines-badge" class="badge-pill" style="display:none;">0</span>
+            </div>
+
+            <div class="nav-section-title">Administrasi</div>
+            <div class="nav-item" data-nav="reports" onclick="window.PustakaApp.navigate('reports')">
+              <i data-lucide="file-bar-chart"></i>
+              <span>Laporan Terpadu</span>
+            </div>
+          </div>
+
+          <!-- MEMBER SPECIFIC NAV -->
+          <div class="member-only-nav" style="display:none;">
+            <div class="nav-section-title">Aktivitas Saya</div>
+            <div class="nav-item" data-nav="my-loans" onclick="window.PustakaApp.navigate('my-loans')">
+              <i data-lucide="bookmark-check"></i>
+              <span>Peminjaman Saya</span>
+            </div>
+            <div class="nav-item" data-nav="my-history" onclick="window.PustakaApp.navigate('my-history')">
+              <i data-lucide="history"></i>
+              <span>Riwayat Transaksi</span>
+            </div>
+          </div>
+
+          <div class="nav-section-title">Pengaturan</div>
+          <div class="nav-item" data-nav="profile" onclick="window.PustakaApp.navigate('profile')">
+            <i data-lucide="user"></i>
+            <span>Profil Akun</span>
+          </div>
+        </nav>
+
+        <div class="sidebar-footer">
+          <!-- Active User Card -->
+          <div class="user-sidebar-card" onclick="window.PustakaApp.navigate('profile')">
+            <div class="user-avatar" id="sidebar-user-avatar">R</div>
+            <div class="user-info">
+              <div class="name" id="sidebar-user-name">Rina Suryani</div>
+              <div class="role-tag" id="sidebar-user-role">
+                <i data-lucide="shield" style="width:12px;height:12px;"></i> Admin Perpustakaan
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-secondary btn-sm" style="width:100%;margin-top:6px;justify-content:flex-start;" onclick="window.PustakaApp.logout()">
+            <i data-lucide="log-out"></i> Keluar (Logout)
+          </button>
+        </div>
+      </aside>
+
+      <!-- MAIN CONTENT WRAPPER -->
+      <div class="main-wrapper">
+        <!-- HEADER (Section 13.2) -->
+        <header class="header">
+          <div class="header-left">
+            <button class="btn-mobile-menu" onclick="window.PustakaApp.toggleMobileSidebar()">
+              <i data-lucide="menu"></i>
+            </button>
+            <div class="page-title-wrap">
+              <span id="header-breadcrumb" class="small-text text-muted">Perpustakaan / Beranda</span>
+            </div>
+          </div>
+
+          <div class="header-right">
+            <!-- Simulated date badge -->
+            <div class="badge badge-neutral" title="Simulasi tanggal operasional sistem">
+              <i data-lucide="calendar" style="width:13px;height:13px;"></i>
+              <span id="system-date-display">01 Okt 2026</span>
+            </div>
+
+            <!-- Quick Account Switch Dropdown -->
+            <button class="account-pill-switch" onclick="window.PustakaApp.openSwitchAccountModal()" title="Beralih peran pengguna untuk demonstrasi">
+              <i data-lucide="repeat" style="width:13px;height:13px;"></i> Ganti Akun
+            </button>
+
+            <!-- Activity Notifications Bell -->
+            <button class="header-action-btn" onclick="window.PustakaApp.openNotificationsModal()" title="Notifikasi Aktivitas">
+              <i data-lucide="bell"></i>
+              <span class="notif-badge"></span>
+            </button>
+          </div>
+        </header>
+
+        <!-- PAGE CONTENT CONTAINER -->
+        <main class="page-container">
+
+          <!-- =================================================================
+               VIEW: ADMIN DASHBOARD (Section 15)
+               ================================================================= -->
+          <div id="view-dashboard-admin" class="view-panel">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1 id="admin-welcome-title">Selamat datang, Petugas</h1>
+                <p>Ringkasan operasional dan sirkulasi buku perpustakaan hari ini.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.openNewLoanModal()">
+                  <i data-lucide="plus-circle"></i> + Peminjaman Baru
+                </button>
+                <button class="btn btn-secondary" onclick="window.PustakaApp.openNewBookModal()">
+                  <i data-lucide="book-plus"></i> + Tambah Buku
+                </button>
+              </div>
+            </div>
+
+            <!-- Stats Ribbon Cards -->
+            <div class="stats-grid">
+              <div class="stat-card stat-primary">
+                <div class="stat-icon-wrap"><i data-lucide="book"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Total Judul Buku</div>
+                  <div class="stat-value" id="dash-total-books">0</div>
+                  <div class="stat-subtext" id="dash-stock-breakdown">0 eksemplar tersedia</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-info">
+                <div class="stat-icon-wrap"><i data-lucide="users"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Total Anggota</div>
+                  <div class="stat-value" id="dash-total-members">0</div>
+                  <div class="stat-subtext" id="dash-active-members">0 anggota aktif</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-warning">
+                <div class="stat-icon-wrap"><i data-lucide="book-open"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Buku Sedang Dipinjam</div>
+                  <div class="stat-value" id="dash-borrowed-books">0</div>
+                  <div class="stat-subtext">Dari transaksi aktif</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-error">
+                <div class="stat-icon-wrap"><i data-lucide="alert-triangle"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Transaksi Terlambat</div>
+                  <div class="stat-value" id="dash-overdue-loans">0</div>
+                  <div class="stat-subtext" id="dash-unpaid-fines">Total denda: $0</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dashboard Split Layout: Recent Loans & Recent Activities -->
+            <div style="display:grid;grid-template-columns:2fr 1fr;gap:var(--space-xl);" class="dash-split-grid">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <i data-lucide="book-marked"></i> Peminjaman Terbaru
+                  </div>
+                  <button class="btn btn-secondary btn-sm" onclick="window.PustakaApp.navigate('loans')">Lihat Semua</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>ID Transaksi</th>
+                        <th>Anggota</th>
+                        <th>Jumlah Buku</th>
+                        <th>Jatuh Tempo</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dash-recent-loans-tbody">
+                      <!-- Rendered by JS -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">
+                    <i data-lucide="activity"></i> Aktivitas Sistem
+                  </div>
+                  <span class="small-text text-muted">Real-time</span>
+                </div>
+                <div id="dash-activity-timeline" style="display:flex;flex-direction:column;gap:14px;">
+                  <!-- Rendered by JS -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: MEMBER DASHBOARD (Section 15 & 33)
+               ================================================================= -->
+          <div id="view-dashboard-member" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1 id="member-welcome-title">Selamat datang, Anggota</h1>
+                <p id="member-quota-info">Status kuota peminjaman Anda saat ini.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.navigate('catalog')">
+                  <i data-lucide="search"></i> Cari &amp; Pinjam Buku
+                </button>
+              </div>
+            </div>
+
+            <!-- Member Metric Cards -->
+            <div class="stats-grid">
+              <div class="stat-card stat-primary">
+                <div class="stat-icon-wrap"><i data-lucide="book-open"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Buku Sedang Dipinjam</div>
+                  <div class="stat-value" id="member-dash-borrowed">0</div>
+                  <div class="stat-subtext" id="member-dash-quota">Sisa kuota: 5 buku</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-warning">
+                <div class="stat-icon-wrap"><i data-lucide="calendar"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Jatuh Tempo Terdekat</div>
+                  <div class="stat-value" id="member-dash-nearest-due" style="font-size:1.25rem;">-</div>
+                  <div class="stat-subtext">Durasi pinjam: 7 hari</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-error">
+                <div class="stat-icon-wrap"><i data-lucide="alert-circle"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Tunggakan Denda</div>
+                  <div class="stat-value" id="member-dash-fines">$0</div>
+                  <div class="stat-subtext">Tarif: $2 per hari keterlambatan</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-success">
+                <div class="stat-icon-wrap"><i data-lucide="check-circle-2"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Buku Selesai Dikembalikan</div>
+                  <div class="stat-value" id="member-dash-returned">0</div>
+                  <div class="stat-subtext">Riwayat peminjaman</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Member Active Loans Section -->
+            <div class="card" style="margin-bottom:var(--space-2xl);">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="bookmark"></i> Buku yang Sedang Anda Pinjam
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="window.PustakaApp.navigate('my-loans')">Detail Lengkap</button>
+              </div>
+              <div id="member-active-books-container">
+                <!-- Rendered by JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: BOOK CATALOG (Section 16)
+               ================================================================= -->
+          <div id="view-catalog" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Katalog Koleksi Buku</h1>
+                <p>Jelajahi dan temukan referensi buku akademik, sains, sastra, dan teknologi.</p>
+              </div>
+              <div class="page-actions" id="catalog-admin-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.openNewBookModal()">
+                  <i data-lucide="plus"></i> + Tambah Buku
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter and Search Bar (Section 13.6 & 13.7) -->
+            <div class="filter-bar">
+              <div class="filter-search-wrap">
+                <i data-lucide="search"></i>
+                <input type="text" id="catalog-search" placeholder="Cari judul, penulis, ISBN, atau kode buku..." oninput="window.PustakaApp.filterCatalog()">
+              </div>
+              <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+                <select id="catalog-filter-category" class="form-select" style="width:auto;" onchange="window.PustakaApp.filterCatalog()">
+                  <option value="">Semua Kategori</option>
+                  <!-- Populated by JS -->
+                </select>
+                <select id="catalog-filter-status" class="form-select" style="width:auto;" onchange="window.PustakaApp.filterCatalog()">
+                  <option value="">Semua Status</option>
+                  <option value="Tersedia">Hanya Tersedia</option>
+                  <option value="Tidak Tersedia">Sedang Kosong / Dipinjam</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Catalog Grid Container -->
+            <div id="catalog-grid" class="catalog-grid">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: MANAJEMEN BUKU (ADMIN) (Section 22)
+               ================================================================= -->
+          <div id="view-books" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Manajemen Data Buku</h1>
+                <p>Kelola data induk pustaka, ISBN, stok eksemplar, dan cover buku.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.openNewBookModal()">
+                  <i data-lucide="plus"></i> + Tambah Buku Baru
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <div class="filter-search-wrap">
+                <i data-lucide="search"></i>
+                <input type="text" id="books-admin-search" placeholder="Cari buku..." oninput="window.PustakaApp.renderAdminBooksTable()">
+              </div>
+              <select id="books-admin-cat-filter" class="form-select" style="width:auto;" onchange="window.PustakaApp.renderAdminBooksTable()">
+                <option value="">Semua Kategori</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Cover</th>
+                    <th>Kode / ISBN</th>
+                    <th>Judul &amp; Penulis</th>
+                    <th>Kategori</th>
+                    <th>Stok (Tersedia/Total)</th>
+                    <th>Status</th>
+                    <th class="action-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="books-admin-tbody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: MANAJEMEN KATEGORI (ADMIN) (Section 23)
+               ================================================================= -->
+          <div id="view-categories" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Manajemen Kategori Buku</h1>
+                <p>Pengelompokan klasifikasi bidang keilmuan koleksi perpustakaan.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.openNewCategoryModal()">
+                  <i data-lucide="plus"></i> + Tambah Kategori
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Nama Kategori</th>
+                    <th>Deskripsi</th>
+                    <th>Jumlah Buku Terkait</th>
+                    <th>Tanggal Dibuat</th>
+                    <th class="action-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="categories-admin-tbody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: MANAJEMEN ANGGOTA (ADMIN) (Section 24)
+               ================================================================= -->
+          <div id="view-members" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Manajemen Data Anggota</h1>
+                <p>Data keanggotaan Siswa, Mahasiswa, Guru, dan Dosen perpustakaan.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.openNewMemberModal()">
+                  <i data-lucide="user-plus"></i> + Tambah Anggota
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <div class="filter-search-wrap">
+                <i data-lucide="search"></i>
+                <input type="text" id="members-admin-search" placeholder="Cari nama, email, nomor anggota..." oninput="window.PustakaApp.renderAdminMembersTable()">
+              </div>
+              <select id="members-filter-role" class="form-select" style="width:auto;" onchange="window.PustakaApp.renderAdminMembersTable()">
+                <option value="">Semua Jenis Anggota</option>
+                <option value="Siswa">Siswa (Maks 5 Buku)</option>
+                <option value="Mahasiswa">Mahasiswa (Maks 5 Buku)</option>
+                <option value="Guru">Guru (Maks 10 Buku)</option>
+                <option value="Dosen">Dosen (Maks 10 Buku)</option>
+              </select>
+              <select id="members-filter-status" class="form-select" style="width:auto;" onchange="window.PustakaApp.renderAdminMembersTable()">
+                <option value="">Semua Status</option>
+                <option value="Aktif">Aktif</option>
+                <option value="Nonaktif">Nonaktif</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>No. Anggota</th>
+                    <th>Nama Lengkap</th>
+                    <th>Jenis Anggota</th>
+                    <th>Kontak / Email</th>
+                    <th>Buku Aktif</th>
+                    <th>Status</th>
+                    <th class="action-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="members-admin-tbody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: PEMINJAMAN (ADMIN) (Section 18)
+               ================================================================= -->
+          <div id="view-loans" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Transaksi Peminjaman</h1>
+                <p>Dokumentasi sirkulasi transaksi multi-buku, tanggal pinjam, dan jatuh tempo.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.openNewLoanModal()">
+                  <i data-lucide="plus"></i> + Peminjaman Baru
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <div class="filter-search-wrap">
+                <i data-lucide="search"></i>
+                <input type="text" id="loans-search" placeholder="Cari ID transaksi, nama anggota..." oninput="window.PustakaApp.renderLoansTable()">
+              </div>
+              <select id="loans-filter-status" class="form-select" style="width:auto;" onchange="window.PustakaApp.renderLoansTable()">
+                <option value="">Semua Status Transaksi</option>
+                <option value="Dipinjam">Dipinjam (Aktif)</option>
+                <option value="Sebagian Kembali">Sebagian Kembali</option>
+                <option value="Terlambat">Terlambat</option>
+                <option value="Selesai">Selesai</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID Transaksi</th>
+                    <th>Anggota Peminjam</th>
+                    <th>Daftar Buku Dipinjam</th>
+                    <th>Tgl Pinjam</th>
+                    <th>Jatuh Tempo (7 Hari)</th>
+                    <th>Status</th>
+                    <th class="action-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="loans-tbody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: PENGEMBALIAN (ADMIN) (Section 19)
+               ================================================================= -->
+          <div id="view-returns" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Pengembalian Buku</h1>
+                <p>Pilih transaksi untuk memproses pengembalian buku dan perhitungan denda otomatis.</p>
+              </div>
+            </div>
+
+            <!-- Active Borrowings ready to return -->
+            <div class="card" style="margin-bottom:var(--space-2xl);">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="arrow-down-left"></i> Transaksi Aktif Siap Dikembalikan
+                </div>
+                <span class="small-text text-muted">Mendukung pengembalian parsial per buku</span>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID Transaksi</th>
+                      <th>Anggota</th>
+                      <th>Buku Belum Kembali</th>
+                      <th>Jatuh Tempo</th>
+                      <th>Keterlambatan Hari Ini</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ready-returns-tbody">
+                    <!-- Rendered by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Returns History Table -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <i data-lucide="history"></i> Log Pengembalian Terbaru
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>ID Transaksi</th>
+                      <th>Anggota</th>
+                      <th>Buku Dikembalikan</th>
+                      <th>Tgl Kembali</th>
+                      <th>Hari Terlambat</th>
+                      <th>Denda Terhitung ($2/hari)</th>
+                    </tr>
+                  </thead>
+                  <tbody id="returns-history-tbody">
+                    <!-- Rendered by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: DENDA & PEMBAYARAN (ADMIN) (Section 20)
+               ================================================================= -->
+          <div id="view-fines" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Pengelolaan Denda &amp; Pembayaran</h1>
+                <p>Monitoring sanksi keterlambatan ($2 per hari) dan pencatatan pembayaran resmi.</p>
+              </div>
+            </div>
+
+            <!-- Stats KPI Cards -->
+            <div class="stats-grid">
+              <div class="stat-card stat-error">
+                <div class="stat-icon-wrap"><i data-lucide="clock"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Total Denda Belum Dibayar</div>
+                  <div class="stat-value" id="fines-unpaid-amount">$0</div>
+                  <div class="stat-subtext" id="fines-unpaid-count">0 tagihan aktif</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-success">
+                <div class="stat-icon-wrap"><i data-lucide="check-circle-2"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Total Denda Sudah Lunas</div>
+                  <div class="stat-value" id="fines-paid-amount">$0</div>
+                  <div class="stat-subtext" id="fines-paid-count">0 transaksi lunas</div>
+                </div>
+              </div>
+
+              <div class="stat-card stat-info">
+                <div class="stat-icon-wrap"><i data-lucide="wallet"></i></div>
+                <div class="stat-info">
+                  <div class="stat-label">Akumulasi Seluruh Denda</div>
+                  <div class="stat-value" id="fines-total-amount">$0</div>
+                  <div class="stat-subtext">Histori denda keseluruhan</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <div class="filter-search-wrap">
+                <i data-lucide="search"></i>
+                <input type="text" id="fines-search" placeholder="Cari kode denda, nama anggota..." oninput="window.PustakaApp.renderFinesTable()">
+              </div>
+              <select id="fines-filter-status" class="form-select" style="width:auto;" onchange="window.PustakaApp.renderFinesTable()">
+                <option value="">Semua Status Pembayaran</option>
+                <option value="Belum Dibayar">Belum Dibayar (Tertunggak)</option>
+                <option value="Lunas">Sudah Lunas</option>
+              </select>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Kode Denda</th>
+                    <th>Anggota</th>
+                    <th>Judul Buku</th>
+                    <th>Keterlambatan</th>
+                    <th>Nominal ($2/hari)</th>
+                    <th>Status</th>
+                    <th>Tgl Bayar &amp; Metode</th>
+                    <th class="action-col">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="fines-tbody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: LAPORAN (ADMIN) (Section 21)
+               ================================================================= -->
+          <div id="view-reports" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Laporan Administrasi Perpustakaan</h1>
+                <p>Data laporan komprehensif yang dapat ditampilkan, dicetak, dan diekspor.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-secondary" onclick="window.PustakaApp.printCurrentReport()">
+                  <i data-lucide="printer"></i> Cetak Laporan (Print)
+                </button>
+                <button class="btn btn-primary" onclick="window.PustakaApp.exportReportCSV()">
+                  <i data-lucide="download"></i> Export Excel (CSV)
+                </button>
+                <button class="btn btn-secondary" onclick="window.PustakaApp.exportReportJSON()">
+                  <i data-lucide="file-json"></i> Export JSON
+                </button>
+              </div>
+            </div>
+
+            <!-- Report Navigation Tabs -->
+            <div class="report-tabs">
+              <button class="report-tab-btn active" data-tab="buku" onclick="window.PustakaApp.switchReportTab('buku')">
+                <i data-lucide="book" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Laporan Buku
+              </button>
+              <button class="report-tab-btn" data-tab="anggota" onclick="window.PustakaApp.switchReportTab('anggota')">
+                <i data-lucide="users" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Laporan Anggota
+              </button>
+              <button class="report-tab-btn" data-tab="peminjaman" onclick="window.PustakaApp.switchReportTab('peminjaman')">
+                <i data-lucide="book-up-2" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Laporan Peminjaman
+              </button>
+              <button class="report-tab-btn" data-tab="pengembalian" onclick="window.PustakaApp.switchReportTab('pengembalian')">
+                <i data-lucide="rotate-ccw" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Laporan Pengembalian
+              </button>
+              <button class="report-tab-btn" data-tab="denda" onclick="window.PustakaApp.switchReportTab('denda')">
+                <i data-lucide="dollar-sign" style="width:16px;height:16px;display:inline-block;vertical-align:middle;margin-right:4px;"></i> Laporan Denda &amp; Keuangan
+              </button>
+            </div>
+
+            <!-- Report Filter Controls -->
+            <div class="filter-bar">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <label class="small-text font-weight-bold" for="report-start-date">Periode:</label>
+                <input type="date" id="report-start-date" class="form-control" style="width:auto;padding:6px 10px;" value="2026-09-01" onchange="window.PustakaApp.renderReport()">
+                <span class="small-text text-muted">s/d</span>
+                <input type="date" id="report-end-date" class="form-control" style="width:auto;padding:6px 10px;" value="2026-10-31" onchange="window.PustakaApp.renderReport()">
+              </div>
+              <div class="filter-search-wrap">
+                <i data-lucide="search"></i>
+                <input type="text" id="report-search" placeholder="Cari data laporan..." oninput="window.PustakaApp.renderReport()">
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="window.PustakaApp.resetReportFilters()">Reset Filter</button>
+            </div>
+
+            <!-- Printable Letterhead Header (Only displayed during Print) -->
+            <div class="print-only-letterhead">
+              <h2>SISTEM INFORMASI DAN MANAJEMEN PERPUSTAKAAN</h2>
+              <p>PUSAT LAYANAN AKADEMIK &amp; PERPUSTAKAAN DIGITAL TERPADU</p>
+              <p style="margin-top:4px;"><strong>LAPORAN RESMI ADMINISTRASI</strong> &bull; Dicetak pada: <span id="print-timestamp">01 Oktober 2026</span></p>
+            </div>
+
+            <!-- Summary KPI ribbon for report -->
+            <div id="report-summary-bar" class="card" style="margin-bottom:var(--space-lg);padding:14px var(--space-xl);background-color:var(--color-surface-muted);">
+              <!-- Rendered by JS -->
+            </div>
+
+            <!-- Main Report Data Table -->
+            <div class="table-responsive">
+              <table class="data-table" id="report-table">
+                <thead id="report-table-head">
+                  <!-- Rendered by JS -->
+                </thead>
+                <tbody id="report-table-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Print Signature Block -->
+            <div class="print-signature-block" style="display:none;">
+              <div class="sign-col">
+                <p>Mengetahui,</p>
+                <p>Kepala Perpustakaan</p>
+                <div class="sign-line">Dr. H. Bambang Susanto, M.Pd.</div>
+                <small>NIP. 19780512 200212 1 002</small>
+              </div>
+              <div class="sign-col">
+                <p>Jakarta, 01 Oktober 2026</p>
+                <p>Petugas Administrasi</p>
+                <div class="sign-line" id="print-officer-name">Rina Suryani</div>
+                <small>Petugas Sirkulasi &amp; Data</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: PEMINJAMAN SAYA & RIWAYAT (MEMBER)
+               ================================================================= -->
+          <div id="view-member-loans" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1 id="member-loans-title">Peminjaman Saya</h1>
+                <p>Daftar buku yang sedang Anda pinjam beserta tanggal jatuh tempo.</p>
+              </div>
+              <div class="page-actions">
+                <button class="btn btn-primary" onclick="window.PustakaApp.navigate('catalog')">
+                  <i data-lucide="plus"></i> Pinjam Buku Lain
+                </button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Buku</th>
+                    <th>Judul &amp; Penulis</th>
+                    <th>Tanggal Pinjam</th>
+                    <th>Jatuh Tempo (7 Hari)</th>
+                    <th>Sisa Waktu</th>
+                    <th>Status</th>
+                    <th>Denda Keterlambatan</th>
+                  </tr>
+                </thead>
+                <tbody id="member-loans-tbody">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- =================================================================
+               VIEW: PROFIL PENGGUNA (Section 40)
+               ================================================================= -->
+          <div id="view-profile" class="view-panel" style="display:none;">
+            <div class="page-header">
+              <div class="page-title-wrap">
+                <h1>Profil Pengguna</h1>
+                <p>Informasi akun dan pengaturan keanggotaan perpustakaan.</p>
+              </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 2fr;gap:var(--space-2xl);" class="profile-grid">
+              <!-- Profile Card -->
+              <div class="card" style="text-align:center;">
+                <div class="user-avatar" id="profile-big-avatar" style="width:84px;height:84px;font-size:2rem;margin:0 auto var(--space-md);">R</div>
+                <h3 id="profile-card-name" style="margin-bottom:4px;">Rina Suryani</h3>
+                <p id="profile-card-role" class="small-text text-secondary" style="margin-bottom:var(--space-md);">Admin Perpustakaan</p>
+                <div id="profile-card-badge" class="badge badge-aktif" style="margin-bottom:var(--space-xl);">Akun Aktif</div>
+
+                <div style="text-align:left;border-top:1px solid var(--color-border);padding-top:var(--space-md);display:flex;flex-direction:column;gap:8px;">
+                  <div class="small-text"><strong>Nomor Anggota:</strong> <span id="profile-card-num">-</span></div>
+                  <div class="small-text"><strong>Email:</strong> <span id="profile-card-email">-</span></div>
+                  <div class="small-text"><strong>No. Telepon:</strong> <span id="profile-card-phone">-</span></div>
+                  <div class="small-text"><strong>Batas Kuota Pinjam:</strong> <span id="profile-card-limit">-</span></div>
+                </div>
+
+                <div style="margin-top:var(--space-xl);border-top:1px dashed var(--color-border);padding-top:var(--space-md);">
+                  <button class="btn btn-secondary btn-sm" style="width:100%;color:var(--color-error);" onclick="window.PustakaApp.resetDefaultDataPrompt()">
+                    <i data-lucide="refresh-cw"></i> Reset Database Demo ke Awal
+                  </button>
+                </div>
+              </div>
+
+              <!-- Edit Profile Form -->
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><i data-lucide="edit-3"></i> Perbarui Data Profil</div>
+                </div>
+                <form id="form-edit-profile" onsubmit="event.preventDefault(); window.PustakaApp.saveProfile();">
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Nama Lengkap</label>
+                      <input type="text" id="prof-input-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Email</label>
+                      <input type="email" id="prof-input-email" class="form-control" required>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label class="form-label">Nomor Telepon</label>
+                      <input type="text" id="prof-input-phone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Jenis Anggota</label>
+                      <input type="text" id="prof-input-type" class="form-control" disabled>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Alamat</label>
+                    <textarea id="prof-input-address" class="form-control" rows="3"></textarea>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">
+                    <i data-lucide="save"></i> Simpan Perubahan Profil
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       MODALS
+       ========================================================================= -->
+
+  <!-- MODAL: DETAIL BUKU (Section 17) -->
+  <div id="modal-book-detail" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>Detail Buku Koleksi</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-book-detail')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="modal-book-detail-body">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-book-detail')">Tutup</button>
+        <button id="btn-modal-borrow-direct" class="btn btn-primary" onclick="window.PustakaApp.borrowBookDirect()">
+          <i data-lucide="book-up-2"></i> Pinjam Buku Ini
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: FORM TAMBAH / EDIT BUKU (Section 22) -->
+  <div id="modal-book-form" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-book-form-title">Tambah Buku Baru</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-book-form')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-book-crud" onsubmit="event.preventDefault(); window.PustakaApp.submitBookForm();">
+        <div class="modal-body">
+          <input type="hidden" id="book-form-id">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Kode Buku <span class="required">*</span></label>
+              <input type="text" id="book-form-code" class="form-control" placeholder="Contoh: TIK-009" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ISBN (Opsional)</label>
+              <input type="text" id="book-form-isbn" class="form-control" placeholder="978-602-xxx">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Judul Buku <span class="required">*</span></label>
+            <input type="text" id="book-form-title" class="form-control" placeholder="Judul lengkap buku" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Penulis / Pengarang <span class="required">*</span></label>
+              <input type="text" id="book-form-author" class="form-control" placeholder="Nama penulis" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Kategori <span class="required">*</span></label>
+              <select id="book-form-category" class="form-select" required>
+                <!-- Populated by JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Penerbit <span class="required">*</span></label>
+              <input type="text" id="book-form-publisher" class="form-control" placeholder="Nama penerbit" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tahun Terbit <span class="required">*</span></label>
+              <input type="number" id="book-form-year" class="form-control" min="1900" max="2099" value="2025" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jumlah Stok <span class="required">*</span></label>
+              <input type="number" id="book-form-stock" class="form-control" min="1" max="999" value="5" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Pilih Gambar Cover</label>
+              <select id="book-form-cover-preset" class="form-select" onchange="window.PustakaApp.handleCoverPresetChange(this.value)">
+                <option value="assets/covers/cover_ai_ml.jpg">Cover AI &amp; Machine Learning (JPG)</option>
+                <option value="assets/covers/cover_fisika.jpg">Cover Fisika Modern (JPG)</option>
+                <option value="assets/covers/cover_sastra.svg">Cover Novel Sastra Lembayung (SVG)</option>
+                <option value="assets/covers/cover_ekonomi.svg">Cover Manajemen Bisnis (SVG)</option>
+                <option value="assets/covers/cover_webdev.svg">Cover Arsitektur Web (SVG)</option>
+                <option value="assets/covers/cover_sejarah.svg">Cover Sejarah Nusantara (SVG)</option>
+                <option value="assets/covers/cover_kedokteran.svg">Cover Farmakologi Kedokteran (SVG)</option>
+                <option value="assets/covers/cover_hukum.svg">Cover Hukum Tata Negara (SVG)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lokasi Rak</label>
+              <input type="text" id="book-form-shelf" class="form-control" placeholder="Contoh: Rak A-03">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Deskripsi &amp; Sinopsis Buku</label>
+            <textarea id="book-form-desc" class="form-control" rows="3" placeholder="Uraian singkat mengenai isi dan topik buku..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-book-form')">Batal</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-book">
+            <i data-lucide="check"></i> Simpan Data Buku
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FORM KATEGORI (Section 23) -->
+  <div id="modal-category-form" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 id="modal-category-form-title">Tambah Kategori Baru</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-category-form')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-category-crud" onsubmit="event.preventDefault(); window.PustakaApp.submitCategoryForm();">
+        <div class="modal-body">
+          <input type="hidden" id="category-form-id">
+          <div class="form-group">
+            <label class="form-label">Nama Kategori <span class="required">*</span></label>
+            <input type="text" id="category-form-name" class="form-control" placeholder="Contoh: Filsafat &amp; Pemikiran" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deskripsi Kategori</label>
+            <textarea id="category-form-desc" class="form-control" rows="3" placeholder="Keterangan cakupan buku untuk kategori ini..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-category-form')">Batal</button>
+          <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> Simpan Kategori</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FORM ANGGOTA (Section 24) -->
+  <div id="modal-member-form" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-member-form-title">Tambah Anggota Baru</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-member-form')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-member-crud" onsubmit="event.preventDefault(); window.PustakaApp.submitMemberForm();">
+        <div class="modal-body">
+          <input type="hidden" id="member-form-id">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nomor Anggota</label>
+              <input type="text" id="member-form-code" class="form-control" placeholder="Otomatis jika dikosongkan">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Anggota <span class="required">*</span></label>
+              <select id="member-form-type" class="form-select" required>
+                <option value="Siswa">Siswa (Maks 5 Buku)</option>
+                <option value="Mahasiswa">Mahasiswa (Maks 5 Buku)</option>
+                <option value="Guru">Guru (Maks 10 Buku)</option>
+                <option value="Dosen">Dosen (Maks 10 Buku)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Nama Lengkap <span class="required">*</span></label>
+              <input type="text" id="member-form-name" class="form-control" placeholder="Nama lengkap anggota" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Akun <span class="required">*</span></label>
+              <input type="email" id="member-form-email" class="form-control" placeholder="email@sekolah.ac.id" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">No. Telepon / WhatsApp</label>
+              <input type="text" id="member-form-phone" class="form-control" placeholder="08xxxxxxxxxx">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Status Anggota</label>
+              <select id="member-form-status" class="form-select">
+                <option value="Aktif">Aktif</option>
+                <option value="Nonaktif">Nonaktif</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Alamat Lengkap</label>
+            <textarea id="member-form-address" class="form-control" rows="2" placeholder="Alamat domisili anggota"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-member-form')">Batal</button>
+          <button type="submit" class="btn btn-primary"><i data-lucide="check"></i> Simpan Data Anggota</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DETAIL ANGGOTA (Section 24) -->
+  <div id="modal-member-detail" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>Detail Informasi Anggota</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-member-detail')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="modal-member-detail-body">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-member-detail')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PEMINJAMAN BARU DENGAN STEPPER (Section 18.2) -->
+  <div id="modal-new-loan" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>Peminjaman Buku Baru</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-new-loan')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <!-- Stepper Indicators -->
+        <div class="stepper-header">
+          <div class="step-item active" id="loan-step-ind-1">
+            <div class="step-circle">1</div>
+            <div class="step-title">01 Anggota</div>
+          </div>
+          <div class="step-item" id="loan-step-ind-2">
+            <div class="step-circle">2</div>
+            <div class="step-title">02 Buku</div>
+          </div>
+          <div class="step-item" id="loan-step-ind-3">
+            <div class="step-circle">3</div>
+            <div class="step-title">03 Konfirmasi</div>
+          </div>
+        </div>
+
+        <!-- STEP 1: PILIH ANGGOTA -->
+        <div id="loan-step-content-1" class="stepper-content">
+          <div class="form-group">
+            <label class="form-label">Cari &amp; Pilih Anggota Perpustakaan <span class="required">*</span></label>
+            <select id="loan-select-member" class="form-select" onchange="window.PustakaApp.handleLoanMemberSelect(this.value)">
+              <option value="">-- Pilih Anggota Peminjam --</option>
+              <!-- Populated by JS -->
+            </select>
+          </div>
+
+          <!-- Selected Member Quota Card -->
+          <div id="loan-member-preview" class="card" style="display:none;background-color:var(--color-surface-muted);padding:var(--space-md);margin-top:var(--space-md);">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- STEP 2: PILIH BUKU (MULTI-BOOK CHECKBOXES) -->
+        <div id="loan-step-content-2" class="stepper-content" style="display:none;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-sm);">
+            <label class="form-label" style="margin-bottom:0;">Pilih Buku untuk Dipinjam (Bisa Multi-Buku)</label>
+            <div id="loan-counter-badge" class="badge badge-neutral">Dipilih: 0 / Sisa Kuota: 0</div>
+          </div>
+
+          <div class="form-group">
+            <input type="text" id="loan-book-search-input" class="form-control" placeholder="Cari buku dalam daftar..." oninput="window.PustakaApp.filterLoanBookPicker(this.value)">
+          </div>
+
+          <div id="loan-book-picker-list" class="book-picker-list">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- STEP 3: KONFIRMASI -->
+        <div id="loan-step-content-3" class="stepper-content" style="display:none;">
+          <div class="card" style="background-color:var(--color-surface-muted);margin-bottom:var(--space-md);">
+            <h4 style="margin-bottom:var(--space-sm);color:var(--color-primary);"><i data-lucide="check-circle" style="width:18px;height:18px;display:inline-block;vertical-align:middle;"></i> Ringkasan Peminjaman</h4>
+            <div id="loan-summary-details">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Tanggal Peminjaman</label>
+              <input type="date" id="loan-confirm-pinjam-date" class="form-control" value="2026-10-01" onchange="window.PustakaApp.updateLoanDueDates(this.value)">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Jatuh Tempo (Otomatis +7 Hari)</label>
+              <input type="date" id="loan-confirm-tempo-date" class="form-control" value="2026-10-08" readonly style="background-color:#E2E8F0;">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" id="btn-loan-prev" class="btn btn-secondary" style="display:none;" onclick="window.PustakaApp.loanPrevStep()">Kembali</button>
+        <button type="button" id="btn-loan-next" class="btn btn-primary" onclick="window.PustakaApp.loanNextStep()">Lanjut ke Pilih Buku &rarr;</button>
+        <button type="button" id="btn-loan-submit" class="btn btn-success" style="display:none;" onclick="window.PustakaApp.submitNewLoan()">
+          <i data-lucide="check"></i> Konfirmasi Peminjaman
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PROSES PENGEMBALIAN BUKU DENGAN MULTI-BOOK SUPPORT (Section 19) -->
+  <div id="modal-return-process" class="modal-backdrop">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3>Pemrosesan Pengembalian Buku</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-return-process')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="modal-return-process-body">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-return-process')">Batal</button>
+        <button class="btn btn-primary" id="btn-submit-return" onclick="window.PustakaApp.submitReturnTransaction()">
+          <i data-lucide="rotate-ccw"></i> Proses Pengembalian Buku
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PEMBAYARAN DENDA (Section 20 & PRD FR-10) -->
+  <div id="modal-pay-fine" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Pencatatan Pembayaran Denda</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-pay-fine')"><i data-lucide="x"></i></button>
+      </div>
+      <form id="form-pay-fine" onsubmit="event.preventDefault(); window.PustakaApp.submitFinePayment();">
+        <div class="modal-body">
+          <input type="hidden" id="pay-fine-id">
+
+          <div class="card" style="background-color:var(--color-surface-muted);padding:var(--space-md);margin-bottom:var(--space-lg);">
+            <div class="small-text">Anggota: <strong id="pay-fine-member-name">-</strong></div>
+            <div class="small-text">Kode Denda: <span id="pay-fine-code">-</span></div>
+            <div class="small-text">Keterlambatan: <span id="pay-fine-days">0 hari</span></div>
+            <div style="margin-top:8px;font-size:1.25rem;font-weight:700;color:var(--color-error);" id="pay-fine-total-display">$0</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Tanggal Pembayaran <span class="required">*</span></label>
+            <input type="date" id="pay-fine-date" class="form-control" value="2026-10-01" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Metode Pembayaran <span class="required">*</span></label>
+            <select id="pay-fine-method" class="form-select" required>
+              <option value="">-- Pilih Metode Pembayaran --</option>
+              <option value="Tunai">Tunai (Cash di Meja Sirkulasi)</option>
+              <option value="Transfer Bank BCA">Transfer Bank BCA</option>
+              <option value="Transfer Bank Mandiri">Transfer Bank Mandiri</option>
+              <option value="Transfer Bank BRI">Transfer Bank BRI</option>
+              <option value="QRIS">QRIS / Dompet Digital</option>
+              <option value="Kartu Debit">Kartu Debit</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Nomor Resi / Catatan Pembayaran</label>
+            <input type="text" id="pay-fine-notes" class="form-control" placeholder="Contoh: Bukti transfer BCA #10928">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-pay-fine')">Batal</button>
+          <button type="submit" class="btn btn-success">
+            <i data-lucide="check"></i> Simpan Pembayaran Denda
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: UNIVERSAL CONFIRMATION (Section 26) -->
+  <div id="modal-confirm" class="modal-backdrop">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-header">
+        <h3 id="modal-confirm-title">Konfirmasi Tindakan</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-confirm')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-confirm-message">Apakah Anda yakin ingin memproses tindakan ini?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-confirm')">Batal</button>
+        <button type="button" class="btn btn-danger" id="btn-confirm-accept">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: GANTI PERAN PENGGUNA DEMO -->
+  <div id="modal-switch-account" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Ganti Akun Demo</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-switch-account')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body">
+        <p class="small-text text-secondary" style="margin-bottom:var(--space-md);">Pilih profil pengguna untuk melihat hak akses dan fitur masing-masing peran:</p>
+        <div style="display:flex;flex-direction:column;gap:8px;" id="switch-account-list">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-switch-account')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LOG NOTIFIKASI AKTIVITAS -->
+  <div id="modal-notifications" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>Pusat Aktivitas &amp; Notifikasi</h3>
+        <button class="btn-close-modal" onclick="window.PustakaApp.closeModal('modal-notifications')"><i data-lucide="x"></i></button>
+      </div>
+      <div class="modal-body" id="notifications-modal-body" style="max-height:400px;overflow-y:auto;">
+        <!-- Populated by JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="window.PustakaApp.closeModal('modal-notifications')">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER (Section 27) -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPTS -->
+  <script src="js/store.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
